@@ -1,5 +1,6 @@
 import time
 from PIL import Image
+import config
 
 # --- FUNCIÓN UTILITARIA (Se mantiene igual) ---
 def crear_seed_desde_imagen(ruta_imagen):
@@ -54,7 +55,7 @@ if __name__ == "__main__":
     
     # 1. INICIALIZACIÓN (Esto se haría una vez al empezar el juego o nivel)
     print("Inicializando el motor de aleatoriedad del juego...")
-    ruta_imagen_nivel = 'image_seed.png' 
+    ruta_imagen_nivel = config.SEED_IMAGE_PATH 
     seed_base = crear_seed_desde_imagen(ruta_imagen_nivel)
     
     if seed_base is not None:
