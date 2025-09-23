@@ -17,21 +17,21 @@ The project is organized into logical modules for easy management:
 
 PACMAN/
 
-├── assets/             # Contains all game assets (images, sounds, fonts)
+├── 🎨 assets/             # Contains all game assets (images, sounds, fonts)
 
-├── config.py           # Game configuration and global constants (colors, speed, etc.)
+├── ⚙️ config.py           # Game configuration and global constants (colors, speed, etc.)
 
-├── main.py             # Main game entry point, menu, and game loop handler
+├── 🚀 main.py             # Main game entry point, menu, and game loop handler
 
-├── maps.py             # All map layouts and character spawn points
+├── 🗺️ maps.py             # All map layouts and character spawn points
 
-├── player.py           # The Player class, handling movement and input
+├── 🟡 player.py           # The Player class, handling movement and input
 
-├── ghost.py            # The Ghost class, handling AI and movement
+├── 👻 ghost.py            # The Ghost class, handling AI and movement
 
-├── motor_aleatorio.py  # The custom image-based randomness engine
+├── 🎲 motor_aleatorio.py  # The custom image-based randomness engine
 
-└── requirements.txt    # Project dependencies
+└── 📝 requirements.txt    # Project dependencies
 
 Getting Started
 
