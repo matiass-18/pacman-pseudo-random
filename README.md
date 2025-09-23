@@ -46,9 +46,9 @@ pip (Python package installer)
 ## Installation
 Clone the repository:
 
+```sh
 Bash
 
-```sh
 git clone https://github.com/your-username/pacman-project.git
 cd pacman-project
 Create and activate a virtual environment:
