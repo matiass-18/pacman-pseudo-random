@@ -69,18 +69,7 @@ def run_game(map_data):
         # --- LÓGICA Y ACTUALIZACIONES ---
         if not game_over:
             player.move(maze)
-
-            # Lógica del Túnel
-            if map_name == "El Tunel":
-                # Asumiendo que el túnel está en la fila 5 del mapa original
-                # y en las filas 10 y 11 del mapa duplicado
-                tunnel_y_start = 10 * config.TILE_SIZE
-                if player.rect.y >= tunnel_y_start and player.rect.y < tunnel_y_start + (2 * config.TILE_SIZE):
-                    if player.rect.right < 0:
-                        player.x = screen_width
-                    elif player.rect.left > screen_width:
-                        player.x = -player.size
-            
+  
             score += player.eat_dots(maze)
             for ghost in ghosts:
                 ghost.move(maze, motor_del_juego)
@@ -120,7 +109,7 @@ def main():
 
     while True:
         menu_screen.fill(config.BG_COLOR)
-        draw_text(menu_screen, "PAC-MAN", 96, 400, 50, (255, 255, 0))
+        draw_text(menu_screen, "PUNK-MAN", 96, 400, 50, (255, 255, 0))
         draw_text(menu_screen, "Selecciona un Mapa", 50, 400, 160, config.SCORE_COLOR)
 
         for i, name in enumerate(map_names):
