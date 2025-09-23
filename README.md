@@ -16,15 +16,25 @@ This is a Pac-Man clone developed from scratch in Python, using the Pygame libra
 The project is organized into logical modules for easy management:
 
 PACMAN/
+
 ├── assets/             # Contains all game assets (images, sounds, fonts)
+
 ├── config.py           # Game configuration and global constants (colors, speed, etc.)
+
 ├── main.py             # Main game entry point, menu, and game loop handler
+
 ├── maps.py             # All map layouts and character spawn points
+
 ├── player.py           # The Player class, handling movement and input
+
 ├── ghost.py            # The Ghost class, handling AI and movement
+
 ├── motor_aleatorio.py  # The custom image-based randomness engine
+
 └── requirements.txt    # Project dependencies
+
 Getting Started
+
 Follow these instructions to get a copy of the project up and running on your local machine.
 
 ## Prerequisites
