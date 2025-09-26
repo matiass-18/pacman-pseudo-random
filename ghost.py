@@ -2,17 +2,24 @@ import pygame
 import config
 
 class Ghost:
-    def __init__(self, x_tile, y_tile, color):
+    def __init__(self, x_tile, y_tile, color_name, speed): # Añadimos 'speed'
         self.size = config.TILE_SIZE
         self.rect = pygame.Rect(x_tile * self.size, y_tile * self.size, self.size, self.size)
         
-        self.start_pos = (x_tile * self.size, y_tile * self.size)
-        self.color = color
-        
-        self.speed = 2
-        
+        # Cargamos la imagen basándonos en el nombre del color
+        image_path = f'assets/images/ghost_{color_name}.png'
+        original_image = pygame.image.load(image_path).convert_alpha()
+        # La escalamos al tamaño de nuestra celda
+        self.image = pygame.transform.scale(original_image, (self.size, self.size))
+
+        # Guardamos el color original para el modo "asustado"
+        self.normal_color_image = self.image # Guardamos la imagen original
+        # (El resto del código para el modo asustado necesitará usar imágenes también)
+
+        # El resto del método se queda igual
+        self.start_pos = (self.rect.x, self.rect.y)
+        self.speed = speed
         self.direction = (0, 0)
-        self.next_direction = (0,0)
 
     def reset_position(self):
         """ Coloca al fantasma de nuevo en su posición inicial. """
@@ -20,28 +27,43 @@ class Ghost:
         self.direction = (0, 0)
 
     def move(self, maze, motor_aleatorio):
+        # --- LÓGICA DE DECISIÓN EN INTERSECCIONES ---
         # Si el fantasma está alineado, es un punto de decisión.
         if self.is_aligned_with_grid():
-            # 1. Obtener todas las direcciones posibles que no son paredes.
+            # 1. Obtiene todas las direcciones válidas (sin paredes).
             valid_directions = self.get_valid_directions(maze)
             
-            # 2. Lógica de decisión
-            # Si solo hay una salida (callejón sin salida), la toma.
-            if len(valid_directions) == 1:
-                self.direction = valid_directions[0]
-            # Si hay múltiples salidas, elige una al azar, evitando darse la vuelta.
-            elif len(valid_directions) > 1:
+            # 2. Evita darse la vuelta a menos que no haya otra opción.
+            if len(valid_directions) > 1:
                 opposite_direction = (-self.direction[0], -self.direction[1])
                 if opposite_direction in valid_directions:
                     valid_directions.remove(opposite_direction)
-                
-                # Usamos el motor aleatorio para elegir
+            
+            # 3. Usa el motor aleatorio para elegir una de las salidas válidas.
+            if valid_directions:
                 choice = motor_aleatorio.siguiente_numero(0, len(valid_directions) - 1)
                 self.direction = valid_directions[choice]
 
-        # Mueve el fantasma en la dirección determinada
-        self.rect.x += self.direction[0] * self.speed
-        self.rect.y += self.direction[1] * self.speed
+        # --- LÓGICA DE MOVIMIENTO Y COLISIÓN (similar a la del jugador) ---
+        if self.direction == (0, 0):
+            return
+
+        # Creamos un rectángulo de prueba para el próximo movimiento
+        next_rect = self.rect.copy()
+        next_rect.x += self.direction[0] * self.speed
+        next_rect.y += self.direction[1] * self.speed
+        
+        collided = False
+        for wall in maze.walls:
+            if next_rect.colliderect(wall):
+                collided = True
+                # Si choca, se detiene en seco en lugar de atravesar la pared
+                self.direction = (0, 0)
+                break
+        
+        # Solo nos movemos si el camino está libre
+        if not collided:
+            self.rect = next_rect
 
     def is_aligned_with_grid(self):
         """ Verifica si el fantasma está en una celda exacta de la cuadrícula. """
@@ -50,7 +72,7 @@ class Ghost:
 
     def get_valid_directions(self, maze):
         """ Revisa los 4 caminos y devuelve una lista de los que están libres. """
-        all_directions = [(0, -1), (0, 1), (-1, 0), (1, 0), (0,0)] # Arriba, Abajo, Izq, Der
+        all_directions = [(0, -1), (0, 1), (-1, 0), (1, 0)] # Arriba, Abajo, Izq, Der
         valid = []
         for direction in all_directions:
             test_rect = self.rect.copy()
@@ -67,4 +89,4 @@ class Ghost:
         return valid
 
     def draw(self, surface):
-        pygame.draw.rect(surface, self.color, self.rect)
+        surface.blit(self.image, self.rect)

@@ -2,76 +2,83 @@ import pygame
 import config
 
 class Player:
-    def __init__(self, x_tile, y_tile):
+    def __init__(self, x_tile, y_tile, speed):
         self.size = config.TILE_SIZE
         self.rect = pygame.Rect(x_tile * self.size, y_tile * self.size, self.size, self.size)
         
-        # Guardamos la posición inicial para el método reset
-        self.start_pos = (x_tile * self.size, y_tile * self.size)
-        self.lives = config.PLAYER_LIVES
+        # --- CARGA DE IMÁGENES DIRECCIONALES ---
+        self.images = self.load_images()
+        self.image = self.images[(1, 0)] # Imagen inicial (mirando a la derecha)
         
-        self.color = (255, 255, 0)
-        # USA UNA VELOCIDAD QUE SEA DIVISOR DE TILE_SIZE (40)
-        self.speed = 2 
+        self.start_pos = (self.rect.x, self.rect.y)
+        self.lives = config.PLAYER_LIVES
+        self.speed = speed
         
         self.direction = (0, 0)
         self.next_direction = (0, 0)
 
+    def load_images(self):
+        """ Carga todas las imágenes del jugador y las guarda en un diccionario. """
+        images = {}
+        # Cargamos las cuatro imágenes direccionales
+        base_path = 'assets/images/'
+        right = pygame.image.load(f'{base_path}punkman-right.png').convert_alpha()
+        left = pygame.image.load(f'{base_path}punkman-left.png').convert_alpha()
+        up = pygame.image.load(f'{base_path}punkman-up.png').convert_alpha()
+        down = pygame.image.load(f'{base_path}punkman-down.png').convert_alpha()
+        
+        # Las escalamos y asignamos a su dirección correspondiente
+        images[(1, 0)] = pygame.transform.scale(right, (self.size, self.size))   # Derecha
+        images[(-1, 0)] = pygame.transform.scale(left, (self.size, self.size))   # Izquierda
+        images[(0, -1)] = pygame.transform.scale(up, (self.size, self.size))     # Arriba
+        images[(0, 1)] = pygame.transform.scale(down, (self.size, self.size))   # Abajo
+        
+        return images
+
+    def update_image(self):
+        """ Actualiza la imagen del jugador según su dirección actual. """
+        if self.direction != (0, 0):
+            self.image = self.images[self.direction]
+
     def reset_position(self):
-        """ Coloca al jugador de nuevo en su posición inicial. """
         self.rect.topleft = self.start_pos
         self.direction = (0, 0)
         self.next_direction = (0, 0)
+        self.image = self.images[(1, 0)] # Reinicia a la imagen por defecto
 
     def change_direction(self, new_direction):
-        """ Guarda la próxima dirección que el jugador quiere tomar. """
         self.next_direction = new_direction
 
     def move(self, maze):
-        # --- 1. LÓGICA DE GIRO Y REVERSA ---
-        # Reversa instantánea
-        if self.next_direction == (-self.direction[0], -self.direction[1]):
-            self.direction = self.next_direction
-            self.next_direction = (0, 0)
-
-        # Intento de giro en intersección
-        # Como la velocidad es un divisor, la posición siempre será un múltiplo de TILE_SIZE en las intersecciones
-        if (self.rect.x % config.TILE_SIZE == 0) and (self.rect.y % config.TILE_SIZE == 0):
-            if self.next_direction != (0, 0) and self.can_turn(self.next_direction, maze):
+        # --- MODIFICADO PARA ACTUALIZAR LA IMAGEN ---
+        if (self.rect.x % config.TILE_SIZE == 0 and self.rect.y % config.TILE_SIZE == 0):
+            # Reversa instantánea
+            if self.next_direction == (-self.direction[0], -self.direction[1]):
                 self.direction = self.next_direction
-                self.next_direction = (0, 0)
-
-        # --- 2. LÓGICA DE MOVIMIENTO Y COLISIÓN ---
-        if self.direction == (0, 0):
-            return
-
-        # Movemos el rect directamente. Ya no necesitamos x, y flotantes.
-        self.rect.x += self.direction[0] * self.speed
-        self.rect.y += self.direction[1] * self.speed
-
-        # La lógica de colisión es más simple ahora
-        for wall in maze.walls:
-            if self.rect.colliderect(wall):
-                if self.direction[0] > 0: self.rect.right = wall.left
-                elif self.direction[0] < 0: self.rect.left = wall.right
-                if self.direction[1] > 0: self.rect.bottom = wall.top
-                elif self.direction[1] < 0: self.rect.top = wall.bottom
-
-    def can_turn(self, direction, maze):
-        """ Verifica si un giro a una nueva dirección es posible. """
-        test_rect = self.rect.copy()
-        test_rect.x += direction[0]
-        test_rect.y += direction[1]
+                self.update_image() # Actualizamos la imagen
+            # Giro pendiente
+            elif self.next_direction != (0,0):
+                test_rect = self.rect.copy()
+                test_rect.x += self.next_direction[0]
+                test_rect.y += self.next_direction[1]
+                if not any(wall.colliderect(test_rect) for wall in maze.walls):
+                    self.direction = self.next_direction
+                    self.update_image() # Actualizamos la imagen
         
-        for wall in maze.walls:
-            if test_rect.colliderect(wall):
-                return False
-        return True
+        if self.direction == (0, 0): return
+
+        next_rect = self.rect.copy()
+        next_rect.x += self.direction[0] * self.speed
+        next_rect.y += self.direction[1] * self.speed
+        
+        if not any(wall.colliderect(next_rect) for wall in maze.walls):
+            self.rect = next_rect
 
     def draw(self, surface):
-        pygame.draw.rect(surface, self.color, self.rect)
+        surface.blit(self.image, self.rect)
 
     def eat_dots(self, maze):
+        # ... (sin cambios)
         score_added = 0
         collided_indices = self.rect.collidelistall(maze.dots)
         if collided_indices:

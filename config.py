@@ -1,10 +1,13 @@
 SEED_IMAGE_PATH = 'assets/images/image_seed.png'
 
+# Resolución nativa del juego (lienzo virtual)
+WINDOW_WIDTH = 840
+WINDOW_HEIGHT = 680
 
 BG_COLOR = (0, 0, 0) # Negro (formato RGB)
 GAME_TITLE = "Punk-Man"
 
-TILE_SIZE = 40 # Tamaño de cada celda del mapa en píxeles
+TILE_SIZE = 42 # Tamaño de cada celda del mapa en píxeles
 PLAYER_SIZE = 32 # <-- AÑADE ESTA LÍNEA
 
 DOT_COLOR = (255, 255, 255) # Blanco
