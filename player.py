@@ -14,11 +14,9 @@ class Player:
         self.direction = (0, 0)
         self.next_direction = (0, 0)
         
-        # ...existing code...
         self.skin = config.SKINS.get(skin_name, config.SKINS[config.DEFAULT_SKIN_NAME])
         self.images = self._load_images_or_fallback()
-        self.image = self.images[(1, 0)]  # Cambiado de 'right' a (1, 0)
-# ...existing code...
+        self.image = self.images[(1, 0)] 
 
     def _load_images_or_fallback(self):
         imgs = {}
@@ -45,24 +43,19 @@ class Player:
         self.next_direction = d
 
     def move(self, maze):
-        # Permitir un margen de error de alineación (por ejemplo, 2 píxeles)
         align_margin = 2
         x_aligned = abs(self.rect.x % config.TILE_SIZE) <= align_margin
         y_aligned = abs(self.rect.y % config.TILE_SIZE) <= align_margin
         aligned = x_aligned and y_aligned
 
-        # Si estamos casi alineados, forzamos alineación exacta
         if x_aligned:
             self.rect.x = round(self.rect.x / config.TILE_SIZE) * config.TILE_SIZE
         if y_aligned:
             self.rect.y = round(self.rect.y / config.TILE_SIZE) * config.TILE_SIZE
 
-        # 1. Si estamos alineados, intentamos cambiar a la dirección deseada si es posible
         if aligned:
-            # Reversa instantánea
             if self.next_direction == (-self.direction[0], -self.direction[1]):
                 self.direction = self.next_direction
-            # Giro o arranque si la celda está libre
             elif self.next_direction != (0, 0):
                 test_rect = self.rect.copy()
                 test_rect.x += self.next_direction[0]
@@ -70,7 +63,6 @@ class Player:
                 if not any(wall.colliderect(test_rect) for wall in maze.walls):
                     self.direction = self.next_direction
 
-        # 2. Si estamos quietos, intentamos arrancar en cualquier frame si estamos alineados para esa dirección
         if self.direction == (0, 0) and self.next_direction != (0, 0):
             can_start = True
             if self.next_direction[0] != 0 and not y_aligned:
@@ -84,25 +76,20 @@ class Player:
                 if not any(wall.colliderect(test_rect) for wall in maze.walls):
                     self.direction = self.next_direction
 
-        # 3. Si no hay dirección, no nos movemos
         if self.direction == (0, 0):
             return
 
-        # 4. Intentamos avanzar en la dirección actual
         next_rect = self.rect.copy()
         next_rect.x += self.direction[0] * self.speed
         next_rect.y += self.direction[1] * self.speed
 
-        # 5. Si hay pared, nos detenemos
         if any(wall.colliderect(next_rect) for wall in maze.walls):
-            # Forzar alineación a la grilla al detenerse
             self.rect.x = round(self.rect.x / config.TILE_SIZE) * config.TILE_SIZE
             self.rect.y = round(self.rect.y / config.TILE_SIZE) * config.TILE_SIZE
             self.direction = (0, 0)
         else:
             self.rect = next_rect
 
-        # 6. Actualizamos la imagen si corresponde
         if self.direction in self.images:
             self.image = self.images[self.direction]
             
@@ -110,7 +97,6 @@ class Player:
         if direction == (0, 0):
             return False
 
-        # Solo permitir giro si está alineado en la grilla para esa dirección
         if direction[0] != 0 and self.rect.y % config.TILE_SIZE != 0:
             return False
         if direction[1] != 0 and self.rect.x % config.TILE_SIZE != 0:
@@ -126,7 +112,6 @@ class Player:
         surf.blit(self.image, self.rect)
 
     def eat(self, maze):
-        # (Este método de tu amigo está perfecto, no se toca)
         points = 0; activated = False; got_shield = False
         idxs = self.rect.collidelistall(maze.dots)
         for i in sorted(idxs, reverse=True): del maze.dots[i]; points += 10

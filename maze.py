@@ -5,8 +5,8 @@ class Maze:
         self.layout = layout
         self.walls = []
         self.dots = []
-        self.power_dots = []   # 2 o 3
-        self.shield_orbs = []  # 4
+        self.power_dots = []  
+        self.shield_orbs = []  
         self.free_tiles = []
         wall = pygame.Surface((config.TILE_SIZE, config.TILE_SIZE))
         wall.fill(config.WALL_COLOR)

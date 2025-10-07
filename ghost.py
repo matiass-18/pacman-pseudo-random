@@ -61,7 +61,6 @@ class Ghost:
         self.update_state(now)
         step = self.speed()
 
-        # Si está alineado, decide dirección normalmente
         if self.is_aligned_with_grid():
             valid_dirs = self.get_valid_directions(maze)
             if len(valid_dirs) > 1 and self.direction in valid_dirs:
@@ -73,25 +72,21 @@ class Ghost:
             else:
                 self.direction = (0, 0)
 
-        # Si está detenido, intenta buscar dirección aunque no esté alineado
         if self.direction == (0, 0):
-            # Forzar alineación a la grilla más cercana
             self.rect.x = round(self.rect.x / config.TILE_SIZE) * config.TILE_SIZE
             self.rect.y = round(self.rect.y / config.TILE_SIZE) * config.TILE_SIZE
             valid_dirs = self.get_valid_directions(maze)
             if valid_dirs:
                 self.direction = rand_choice(valid_dirs)
             else:
-                return  # Sigue sin poder moverse
+                return  
 
-        # Intentar moverse
         next_rect = self.rect.copy()
         next_rect.x += int(self.direction[0] * step)
         next_rect.y += int(self.direction[1] * step)
         if not any(w.colliderect(next_rect) for w in maze.walls):
             self.rect = next_rect
         else:
-            # Si choca, se detiene y decidirá nueva dirección en el próximo frame
             self.direction = (0, 0)
 
     def draw(self, surf):
