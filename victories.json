@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Juan Jose",
+    "score": 2580,
+    "map": "Mapa Sebas",
+    "stars": 1,
+    "time": 98
+  },
+  {
+    "name": "Mat\u00edas",
+    "score": 3140,
+    "map": "Mapa Bri\u00f1ez",
+    "stars": 0,
+    "time": 158
+  },
+  {
+    "name": "Mat\u00edas",
+    "score": 3320,
+    "map": "Laberinto Caotico",
+    "stars": 1,
+    "time": 126
+  },
+  {
+    "name": "El Matas",
+    "score": 3140,
+    "map": "Mapa Bri\u00f1ez",
+    "stars": 2,
+    "time": 80
+  }
+]
